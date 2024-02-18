@@ -14,7 +14,6 @@ type Flags struct {
 }
 
 func flags() Flags {
-
 	var f Flags
 
 	f.configPath = *flag.String("c", "config.toml", "Provide file path to config.toml configuration file.")
@@ -34,7 +33,6 @@ type Date struct {
 
 func loadConfig(path string) (Config, error) {
 	data, err := os.ReadFile(path)
-
 	if err != nil {
 		log.Fatalf("Failed to read file on path %s\n", path)
 	}
@@ -52,12 +50,15 @@ func loadConfig(path string) (Config, error) {
 
 func main() {
 	flags := flags()
-	tomlConfig, err := loadConfig(flags.configPath)
-
+	_, err := loadConfig(flags.configPath)
 	if err != nil {
 		log.Fatalf("Failed to load config file.\n%v\n", err)
 	}
 
-	fmt.Println(tomlConfig.Date.Begin)
+	data, err := GetDailyData("16.02.2024")
+	if err != nil {
+		log.Fatalf("Attempt to GET daily cnb forex data failed with error:\n%v\n", err)
+	}
 
+	fmt.Println(data)
 }
