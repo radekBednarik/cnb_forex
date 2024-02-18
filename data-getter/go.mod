@@ -1,4 +1,4 @@
-module main.go
+module github.com/radekBednarik/cnb_forex/data-getter
 
 go 1.21.6
 
