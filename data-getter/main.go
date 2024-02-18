@@ -1,12 +1,28 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"os"
 
 	"github.com/BurntSushi/toml"
 )
+
+type Flags struct {
+	configPath string
+}
+
+func flags() Flags {
+
+	var f Flags
+
+	f.configPath = *flag.String("c", "config.toml", "Provide file path to config.toml configuration file.")
+
+	flag.Parse()
+
+	return f
+}
 
 func loadConfig(path string) (toml.MetaData, error) {
 	data, err := os.ReadFile(path)
@@ -33,7 +49,8 @@ func loadConfig(path string) (toml.MetaData, error) {
 }
 
 func main() {
-	tomlConfig, err := loadConfig("config.toml")
+	flags := flags()
+	tomlConfig, err := loadConfig(flags.configPath)
 
 	if err != nil {
 		log.Fatalf("Failed to load config file.\n%v\n", err)
