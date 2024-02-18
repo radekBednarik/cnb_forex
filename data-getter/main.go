@@ -1,14 +1,43 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+	"os"
 
-func main() {
-	response, err := GetDailyData("08.02.2024")
+	"github.com/BurntSushi/toml"
+)
+
+func loadConfig(path string) (toml.MetaData, error) {
+	data, err := os.ReadFile(path)
+
 	if err != nil {
-		panic(1)
+		log.Fatalf("Failed to read file on path %s\n", path)
 	}
 
-	fmt.Println(response.Body)
+	type date struct {
+		begin string
+	}
 
-	response.Body.Close()
+	type config map[string]date
+
+	var con config
+
+	pConf, err := toml.Decode(string(data), &con)
+
+	if err != nil {
+		log.Fatalf("Failed to decode %s to TOML datastructure.", string(data))
+	}
+
+	return pConf, nil
+}
+
+func main() {
+	tomlConfig, err := loadConfig("config.toml")
+
+	if err != nil {
+		log.Fatalf("Failed to load config file.\n%v\n", err)
+	}
+
+	fmt.Println(tomlConfig.Undecoded())
 }
