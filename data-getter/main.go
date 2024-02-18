@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/BurntSushi/toml"
+	"github.com/pelletier/go-toml"
 )
 
 type Flags struct {
@@ -24,28 +24,30 @@ func flags() Flags {
 	return f
 }
 
-func loadConfig(path string) (toml.MetaData, error) {
+type Config struct {
+	Date Date
+}
+
+type Date struct {
+	Begin string
+}
+
+func loadConfig(path string) (Config, error) {
 	data, err := os.ReadFile(path)
 
 	if err != nil {
 		log.Fatalf("Failed to read file on path %s\n", path)
 	}
 
-	type date struct {
-		begin string
-	}
+	var config Config
 
-	type config map[string]date
-
-	var con config
-
-	pConf, err := toml.Decode(string(data), &con)
+	err = toml.Unmarshal(data, &config)
 
 	if err != nil {
-		log.Fatalf("Failed to decode %s to TOML datastructure.", string(data))
+		log.Fatalf("Faild to unmarshal .toml data.\n%v\n", err)
 	}
 
-	return pConf, nil
+	return config, nil
 }
 
 func main() {
@@ -56,5 +58,6 @@ func main() {
 		log.Fatalf("Failed to load config file.\n%v\n", err)
 	}
 
-	fmt.Println(tomlConfig.Undecoded())
+	fmt.Println(tomlConfig.Date.Begin)
+
 }

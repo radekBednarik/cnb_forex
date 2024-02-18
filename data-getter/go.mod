@@ -2,4 +2,4 @@ module main.go
 
 go 1.21.6
 
-require github.com/BurntSushi/toml v1.3.2
+require github.com/pelletier/go-toml v1.9.5
