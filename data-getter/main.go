@@ -8,6 +8,7 @@ import (
 
 	"github.com/pelletier/go-toml"
 	"github.com/radekBednarik/cnb_forex/data-getter/api"
+	"github.com/radekBednarik/cnb_forex/data-getter/parser"
 )
 
 type Flags struct {
@@ -61,5 +62,8 @@ func main() {
 		log.Fatalf("Attempt to GET daily cnb forex data failed with error:\n%v\n", err)
 	}
 
-	fmt.Println(data)
+	pData := parser.ForexDataForDate{}
+	pData.ParseFromText(data)
+
+	fmt.Println(pData)
 }
