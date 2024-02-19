@@ -57,6 +57,13 @@ func main() {
 		log.Fatalf("Failed to load config file.\n%v\n", err)
 	}
 
+	// TODO: here - place db tables creation if no tables found in db
+
+	// TODO: next - start retrieving data from now() to config.date.begin
+	// each date step checks, if it is in the database. if not, continue, if yes, break
+	// since data are here and so we do not need to continue
+	// first load however will be db calls heavy
+
 	data, err := api.GetDailyData("16.01.2024")
 	if err != nil {
 		log.Fatalf("Attempt to GET daily cnb forex data failed with error:\n%v\n", err)
