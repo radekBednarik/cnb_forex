@@ -61,9 +61,9 @@ func main() {
 	// TODO: here - place db tables creation if no tables found in db
 	connString := fmt.Sprintf("user=%s password=%s host=localhost port=5432 dbname=cnb_forex sslmode=verify-ca pool_max_conns=16", os.Getenv("USER"), os.Getenv("PASSWORD"))
 
-	_db := db.Db{}
-	pool := _db.New(connString)
-	db.CreateTables(*pool)
+	dbs := db.Database{}
+	dbs.New(connString)
+	db.CreateTables(dbs)
 
 	// TODO: next - start retrieving data from now() to config.date.begin
 	// each date step checks, if it is in the database. if not, continue, if yes, break
