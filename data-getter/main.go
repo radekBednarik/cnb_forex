@@ -58,11 +58,13 @@ func main() {
 		log.Fatalf("Failed to load config file.\n%v\n", err)
 	}
 
-	// TODO: here - place db tables creation if no tables found in db
+	// connect to db and create connection pool
 	connString := fmt.Sprintf("user=%s password=%s host=localhost port=5432 dbname=cnb_forex sslmode=verify-ca pool_max_conns=16", os.Getenv("USER"), os.Getenv("PASSWORD"))
-
 	dbs := db.Database{}
 	dbs.New(connString)
+	defer dbs.Pool.Close()
+
+	// check if tables are in db, if not, then create
 	db.CreateTables(dbs)
 
 	// TODO: next - start retrieving data from now() to config.date.begin
