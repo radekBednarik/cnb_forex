@@ -7,6 +7,7 @@ import (
 	"log"
 
 	pgpool "github.com/jackc/pgx/v5/pgxpool"
+	p "github.com/radekBednarik/cnb_forex/data-getter/parser"
 )
 
 type Database struct {
@@ -124,56 +125,72 @@ CREATE TABLE data (
 	}
 }
 
-func InsertIntoCountry(value string, dbs Database) {
+func InsertIntoCountry(value string, dbs Database) string {
 	conn := dbs.connect()
 
-	qString := fmt.Sprintf("INSERT INTO country (name) VALUES (%s) ON CONFLICT (name) DO NOTHING;", value)
+	qString := fmt.Sprintf("INSERT INTO country (name) VALUES (%s) ON CONFLICT (name) DO NOTHING RETURNING id;", value)
 
-	_, err := conn.Exec(context.Background(), qString)
+	row := conn.QueryRow(context.Background(), qString)
+	var id string
+	err := row.Scan(&id)
 	conn.Release()
 
 	if err != nil {
 		log.Fatalf("Inserting data to country table failed with error: %v\n", err)
 	}
+
+	return id
 }
 
-func InsertIntoCurrName(value string, dbs Database) {
+func InsertIntoCurrName(value string, dbs Database) string {
 	conn := dbs.connect()
 
-	qString := fmt.Sprintf("INSERT INTO curr_name (name) VALUES (%s) ON CONFLICT (name) DO NOTHING;", value)
+	qString := fmt.Sprintf("INSERT INTO curr_name (name) VALUES (%s) ON CONFLICT (name) DO NOTHING RETURNING id;", value)
 
-	_, err := conn.Exec(context.Background(), qString)
+	row := conn.QueryRow(context.Background(), qString)
+	var id string
+	err := row.Scan(&id)
 	conn.Release()
 
 	if err != nil {
 		log.Fatalf("Inserting data to curr_name table failed with error: %v\n", err)
 	}
+
+	return id
 }
 
-func InsertIntoCurrSymbol(value string, dbs Database) {
+func InsertIntoCurrSymbol(value string, dbs Database) string {
 	conn := dbs.connect()
 
-	qString := fmt.Sprintf("INSERT INTO curr_symbol (symbol) VALUES (%s) ON CONFLICT (symbol) DO NOTHING;", value)
+	qString := fmt.Sprintf("INSERT INTO curr_symbol (symbol) VALUES (%s) ON CONFLICT (symbol) DO NOTHING RETURNING id;", value)
 
-	_, err := conn.Exec(context.Background(), qString)
+	row := conn.QueryRow(context.Background(), qString)
+	var id string
+	err := row.Scan(&id)
 	conn.Release()
 
 	if err != nil {
 		log.Fatalf("Inserting data to curr_symbol table failed with error: %v\n", err)
 	}
+
+	return id
 }
 
-func InsertIntoDate(value string, dbs Database) {
+func InsertIntoDate(value string, dbs Database) string {
 	conn := dbs.connect()
 
 	qString := fmt.Sprintf("INSERT INTO date (date) VALUES (%s) ON CONFLICT (date) DO NOTHING;", value)
 
-	_, err := conn.Exec(context.Background(), qString)
+	row := conn.QueryRow(context.Background(), qString)
+	var id string
+	err := row.Scan(&id)
 	conn.Release()
 
 	if err != nil {
 		log.Fatalf("Inserting data to date table failed with error: %v\n", err)
 	}
+
+	return id
 }
 
 func SelectIdFromTable(value string, fieldName string, table string, dbs Database) (string, error) {
@@ -191,15 +208,39 @@ func SelectIdFromTable(value string, fieldName string, table string, dbs Databas
 	return result, err
 }
 
-func InsertIntoData(country string, curr_name string, curr_symbol string, date string, value float64, dbs Database) {
+func InsertIntoData(countryIndex string, currNameIndex string, currSymbolIndex string, dateIndex string, value float64, dbs Database) {
 	conn := dbs.connect()
 
-	// check, if date is already in the date table
-	// if there is no row, then error means insert into the table
-	id, err := SelectIdFromTable(date, "date", "date", dbs)
+	qString := fmt.Sprintf("INSERT INTO data (country, curr_name, curr_symbol, date, value) VALUES (%s, %s, %s, %s, %f);", countryIndex, currNameIndex, currSymbolIndex, dateIndex, value)
+
+	_, err := conn.Exec(context.Background(), qString)
+	conn.Release()
+
 	if err != nil {
-		InsertIntoDate(date, dbs)
+		log.Fatalf("Inserting data to 'data' table failed with error: %v\n", err)
+	}
+}
+
+func ProcessDailyData(data *p.ForexDataForDate, dbs Database) {
+	// check if date from data is already in db table 'date'
+	id, err := SelectIdFromTable(data.Date, "date", "date", dbs)
+	if err != nil {
+		log.Fatalf("Error when processing the daily forex data. Error: %v\n", err)
 	}
 
-	// TODO: do checks for all other values and insert them, if they are not present
+	// if id was found, then data should be already in db and we can exit
+	// this is a very weak check, TODO: do it better
+	if id != "" {
+		return
+	}
+
+	// data are not in the db, so do insertions
+	idDate := InsertIntoDate(data.Date, dbs)
+
+	for _, curr := range data.ForexData {
+		idCountry := InsertIntoCountry(curr.Country, dbs)
+		idCurrName := InsertIntoCurrName(curr.Name, dbs)
+		idCurrSymbol := InsertIntoCurrSymbol(curr.Symbol, dbs)
+
+	}
 }
