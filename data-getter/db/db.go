@@ -3,7 +3,6 @@ package db
 // https://pkg.go.dev/github.com/jackc/pgx/v5/pgxpool#pkg-overview
 import (
 	"context"
-	"fmt"
 	"log"
 
 	pgpool "github.com/jackc/pgx/v5/pgxpool"
@@ -125,12 +124,12 @@ CREATE TABLE data (
 	}
 }
 
-func InsertIntoCountry(value string, dbs Database) string {
+func insertIntoCountry(value string, dbs Database) string {
 	conn := dbs.connect()
 
-	qString := fmt.Sprintf("INSERT INTO country (name) VALUES (%s) ON CONFLICT (name) DO NOTHING RETURNING id;", value)
+	qString := "INSERT INTO country (name) VALUES ($1) ON CONFLICT (name) DO NOTHING RETURNING id;"
 
-	row := conn.QueryRow(context.Background(), qString)
+	row := conn.QueryRow(context.Background(), qString, value)
 	var id string
 	err := row.Scan(&id)
 	conn.Release()
@@ -142,12 +141,12 @@ func InsertIntoCountry(value string, dbs Database) string {
 	return id
 }
 
-func InsertIntoCurrName(value string, dbs Database) string {
+func insertIntoCurrName(value string, dbs Database) string {
 	conn := dbs.connect()
 
-	qString := fmt.Sprintf("INSERT INTO curr_name (name) VALUES (%s) ON CONFLICT (name) DO NOTHING RETURNING id;", value)
+	qString := "INSERT INTO curr_name (name) VALUES ($1) ON CONFLICT (name) DO NOTHING RETURNING id;"
 
-	row := conn.QueryRow(context.Background(), qString)
+	row := conn.QueryRow(context.Background(), qString, value)
 	var id string
 	err := row.Scan(&id)
 	conn.Release()
@@ -159,12 +158,12 @@ func InsertIntoCurrName(value string, dbs Database) string {
 	return id
 }
 
-func InsertIntoCurrSymbol(value string, dbs Database) string {
+func insertIntoCurrSymbol(value string, dbs Database) string {
 	conn := dbs.connect()
 
-	qString := fmt.Sprintf("INSERT INTO curr_symbol (symbol) VALUES (%s) ON CONFLICT (symbol) DO NOTHING RETURNING id;", value)
+	qString := "INSERT INTO curr_symbol (symbol) VALUES ($1) ON CONFLICT (symbol) DO NOTHING RETURNING id;"
 
-	row := conn.QueryRow(context.Background(), qString)
+	row := conn.QueryRow(context.Background(), qString, value)
 	var id string
 	err := row.Scan(&id)
 	conn.Release()
@@ -176,12 +175,12 @@ func InsertIntoCurrSymbol(value string, dbs Database) string {
 	return id
 }
 
-func InsertIntoDate(value string, dbs Database) string {
+func insertIntoDate(value string, dbs Database) string {
 	conn := dbs.connect()
 
-	qString := fmt.Sprintf("INSERT INTO date (date) VALUES (%s) ON CONFLICT (date) DO NOTHING;", value)
+	qString := "INSERT INTO date (date) VALUES ($1) ON CONFLICT (date) DO NOTHING;"
 
-	row := conn.QueryRow(context.Background(), qString)
+	row := conn.QueryRow(context.Background(), qString, value)
 	var id string
 	err := row.Scan(&id)
 	conn.Release()
@@ -193,12 +192,12 @@ func InsertIntoDate(value string, dbs Database) string {
 	return id
 }
 
-func SelectIdFromTable(value string, fieldName string, table string, dbs Database) (string, error) {
+func selectIdFromTable(value string, fieldName string, table string, dbs Database) (string, error) {
 	conn := dbs.connect()
 
-	qString := fmt.Sprintf("SELECT id from %s WHERE %s = '%s' LIMIT 1;", table, fieldName, value)
+	qString := "SELECT id from $1 WHERE $2 = '$3' LIMIT 1;"
 
-	res := conn.QueryRow(context.Background(), qString)
+	res := conn.QueryRow(context.Background(), qString, table, fieldName, value)
 
 	var result string
 	err := res.Scan(&result)
@@ -208,12 +207,12 @@ func SelectIdFromTable(value string, fieldName string, table string, dbs Databas
 	return result, err
 }
 
-func InsertIntoData(countryIndex string, currNameIndex string, currSymbolIndex string, dateIndex string, value float64, dbs Database) {
+func insertIntoData(countryIndex string, currNameIndex string, currSymbolIndex string, dateIndex string, value float64, dbs Database) {
 	conn := dbs.connect()
 
-	qString := fmt.Sprintf("INSERT INTO data (country, curr_name, curr_symbol, date, value) VALUES (%s, %s, %s, %s, %f);", countryIndex, currNameIndex, currSymbolIndex, dateIndex, value)
+	qString := "INSERT INTO data (country_id, curr_name_id, curr_symbol_id, date_id, value) VALUES ($1, $2, $3, $4, $5);"
 
-	_, err := conn.Exec(context.Background(), qString)
+	_, err := conn.Exec(context.Background(), qString, countryIndex, currNameIndex, currSymbolIndex, dateIndex, value)
 	conn.Release()
 
 	if err != nil {
@@ -223,24 +222,19 @@ func InsertIntoData(countryIndex string, currNameIndex string, currSymbolIndex s
 
 func ProcessDailyData(data *p.ForexDataForDate, dbs Database) {
 	// check if date from data is already in db table 'date'
-	id, err := SelectIdFromTable(data.Date, "date", "date", dbs)
-	if err != nil {
-		log.Fatalf("Error when processing the daily forex data. Error: %v\n", err)
-	}
-
+	_, err := selectIdFromTable(data.Date, "date", "date", dbs)
 	// if id was found, then data should be already in db and we can exit
-	// this is a very weak check, TODO: do it better
-	if id != "" {
+	if err != nil {
 		return
 	}
 
 	// data are not in the db, so do insertions
-	idDate := InsertIntoDate(data.Date, dbs)
+	idDate := insertIntoDate(data.Date, dbs)
 
 	for _, curr := range data.ForexData {
-		idCountry := InsertIntoCountry(curr.Country, dbs)
-		idCurrName := InsertIntoCurrName(curr.Name, dbs)
-		idCurrSymbol := InsertIntoCurrSymbol(curr.Symbol, dbs)
-		InsertIntoData(idCountry, idCurrName, idCurrSymbol, idDate, curr.Value, dbs)
+		idCountry := insertIntoCountry(curr.Country, dbs)
+		idCurrName := insertIntoCurrName(curr.Name, dbs)
+		idCurrSymbol := insertIntoCurrSymbol(curr.Symbol, dbs)
+		insertIntoData(idCountry, idCurrName, idCurrSymbol, idDate, curr.Value, dbs)
 	}
 }
