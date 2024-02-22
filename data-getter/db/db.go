@@ -241,6 +241,6 @@ func ProcessDailyData(data *p.ForexDataForDate, dbs Database) {
 		idCountry := InsertIntoCountry(curr.Country, dbs)
 		idCurrName := InsertIntoCurrName(curr.Name, dbs)
 		idCurrSymbol := InsertIntoCurrSymbol(curr.Symbol, dbs)
-
+		InsertIntoData(idCountry, idCurrName, idCurrSymbol, idDate, curr.Value, dbs)
 	}
 }
