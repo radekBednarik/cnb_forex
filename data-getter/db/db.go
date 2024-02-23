@@ -3,6 +3,7 @@ package db
 // https://pkg.go.dev/github.com/jackc/pgx/v5/pgxpool#pkg-overview
 import (
 	"context"
+	"fmt"
 	"log"
 
 	pgpool "github.com/jackc/pgx/v5/pgxpool"
@@ -178,7 +179,7 @@ func insertIntoCurrSymbol(value string, dbs Database) string {
 func insertIntoDate(value string, dbs Database) string {
 	conn := dbs.connect()
 
-	qString := "INSERT INTO date (date) VALUES ($1) ON CONFLICT (date) DO NOTHING;"
+	qString := "INSERT INTO date (date) VALUES ($1) ON CONFLICT (date) DO NOTHING RETURNING id;"
 
 	row := conn.QueryRow(context.Background(), qString, value)
 	var id string
@@ -195,9 +196,9 @@ func insertIntoDate(value string, dbs Database) string {
 func selectIdFromTable(value string, fieldName string, table string, dbs Database) (string, error) {
 	conn := dbs.connect()
 
-	qString := "SELECT id from $1 WHERE $2 = '$3' LIMIT 1;"
+	qString := fmt.Sprintf("SELECT id FROM %s WHERE %s = $1 LIMIT 1;", table, fieldName)
 
-	res := conn.QueryRow(context.Background(), qString, table, fieldName, value)
+	res := conn.QueryRow(context.Background(), qString, value)
 
 	var result string
 	err := res.Scan(&result)
@@ -224,7 +225,7 @@ func ProcessDailyData(data *p.ForexDataForDate, dbs Database) {
 	// check if date from data is already in db table 'date'
 	_, err := selectIdFromTable(data.Date, "date", "date", dbs)
 	// if id was found, then data should be already in db and we can exit
-	if err != nil {
+	if err == nil {
 		return
 	}
 
@@ -232,6 +233,7 @@ func ProcessDailyData(data *p.ForexDataForDate, dbs Database) {
 	idDate := insertIntoDate(data.Date, dbs)
 
 	for _, curr := range data.ForexData {
+		fmt.Println(curr)
 		idCountry := insertIntoCountry(curr.Country, dbs)
 		idCurrName := insertIntoCurrName(curr.Name, dbs)
 		idCurrSymbol := insertIntoCurrSymbol(curr.Symbol, dbs)
