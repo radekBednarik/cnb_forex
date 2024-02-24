@@ -94,7 +94,7 @@ func crunchData(dbs db.Database, dateBegin string) {
 
 func main() {
 	flags := flags()
-	_, err := loadConfig(flags.configPath)
+	config, err := loadConfig(flags.configPath)
 	if err != nil {
 		log.Fatalf("Failed to load config file.\n%v\n", err)
 	}
@@ -108,17 +108,6 @@ func main() {
 	// check if tables are in db, if not, then create
 	dbs.CreateTables()
 
-	// TODO: create a loop statement, which will go thru dates and stores
-	// them to db. No concurrency, since we do not want to get banned by the server
-	data, err := api.GetDailyData("17.01.2024")
-	if err != nil {
-		log.Fatalf("Attempt to GET daily cnb forex data failed with error:\n%v\n", err)
-	}
-
-	pData := parser.ForexDataForDate{}
-	pData.ParseFromText(data)
-
-	dbs.ProcessDailyData(&pData)
-
-	fmt.Println(pData)
+	// process the data
+	crunchData(dbs, config.Date.Begin)
 }
