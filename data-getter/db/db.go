@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 
 	pgpool "github.com/jackc/pgx/v5/pgxpool"
 	p "github.com/radekBednarik/cnb_forex/data-getter/parser"
@@ -181,6 +182,8 @@ func (dbs Database) insertIntoDate(value string) string {
 
 	qString := "INSERT INTO date (date) VALUES (TO_DATE($1, 'DD.MM.YYYY')) ON CONFLICT (date) DO NOTHING RETURNING id;"
 
+	fmt.Printf("want to insert date: %s\n", value)
+
 	row := conn.QueryRow(context.Background(), qString, value)
 	var id string
 	err := row.Scan(&id)
@@ -196,12 +199,19 @@ func (dbs Database) insertIntoDate(value string) string {
 func (dbs Database) SelectIdFromTable(value string, fieldName string, table string) (string, error) {
 	conn := dbs.connect()
 
+	// transform the value format to that which db uses for storing DATE
+	tParsed, err := time.Parse("01.01.2006", value)
+	if err != nil {
+		log.Fatalf("Parsing %s value to time failed with error: %v\n", value, err)
+	}
+	fValue := tParsed.Format("2024-01-01")
+
 	qString := fmt.Sprintf("SELECT id FROM %s WHERE %s = $1 LIMIT 1;", table, fieldName)
 
-	res := conn.QueryRow(context.Background(), qString, value)
+	res := conn.QueryRow(context.Background(), qString, fValue)
 
 	var result string
-	err := res.Scan(&result)
+	err = res.Scan(&result)
 
 	conn.Release()
 

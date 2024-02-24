@@ -71,12 +71,12 @@ func crunchData(dbs db.Database, dateBegin string) {
 		parsedData := parser.ForexDataForDate{}
 		parsedData.ParseFromText(data)
 
-		fmt.Printf("Data poing: %s\n", parsedData.Date)
+		fmt.Printf("Data point: %s\n", parsedData.Date)
 
 		// check, if date is in db already, if yes, then continue
 		// if we tried five consecutive previous dates and still its in the dbs
 		// then break
-		_, err = dbs.SelectIdFromTable(parsedData.Date, "date", "date")
+		err = dbs.SelectIdFromTable(parsedData.Date, "date", "date")
 		idCounter++
 		if err == nil && idCounter >= 5 {
 			break
@@ -88,7 +88,9 @@ func crunchData(dbs db.Database, dateBegin string) {
 
 		// adjust fNow to previous day
 		now = now.Add(-dayDelta)
+		fmt.Printf("now is: %v\n", now)
 		fNow = now.Format("01.01.2024")
+		fmt.Printf("fNow is: %s\n", fNow)
 
 		// wait for a bit
 		time.Sleep(200 * time.Millisecond)
