@@ -193,7 +193,7 @@ func (dbs Database) insertIntoDate(value string) string {
 	return id
 }
 
-func (dbs Database) selectIdFromTable(value string, fieldName string, table string) (string, error) {
+func (dbs Database) SelectIdFromTable(value string, fieldName string, table string) (string, error) {
 	conn := dbs.connect()
 
 	qString := fmt.Sprintf("SELECT id FROM %s WHERE %s = $1 LIMIT 1;", table, fieldName)
@@ -223,7 +223,7 @@ func (dbs Database) insertIntoData(countryIndex string, currNameIndex string, cu
 
 func (dbs Database) ProcessDailyData(data *p.ForexDataForDate) {
 	// check if date from data is already in db table 'date'
-	_, err := dbs.selectIdFromTable(data.Date, "date", "date")
+	_, err := dbs.SelectIdFromTable(data.Date, "date", "date")
 	// if id was found, then data should be already in db and we can exit
 	if err == nil {
 		return
