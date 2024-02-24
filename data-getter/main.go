@@ -60,8 +60,6 @@ func crunchData(dbs db.Database, dateBegin string) {
 	fNow := now.Format("02.01.2006")
 	idCounter := 0
 
-	fmt.Printf("fNow: %s\n", fNow)
-
 	for fNow != dateBegin {
 		// call api to return data
 		data, err := api.GetDailyData(fNow)
