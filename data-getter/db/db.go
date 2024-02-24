@@ -182,8 +182,6 @@ func (dbs Database) insertIntoDate(value string) string {
 
 	qString := "INSERT INTO date (date) VALUES (TO_DATE($1, 'DD.MM.YYYY')) ON CONFLICT (date) DO NOTHING RETURNING id;"
 
-	fmt.Printf("want to insert date: %s\n", value)
-
 	row := conn.QueryRow(context.Background(), qString, value)
 	var id string
 	err := row.Scan(&id)
@@ -200,11 +198,11 @@ func (dbs Database) SelectIdFromTable(value string, fieldName string, table stri
 	conn := dbs.connect()
 
 	// transform the value format to that which db uses for storing DATE
-	tParsed, err := time.Parse("01.01.2006", value)
+	tParsed, err := time.Parse("02.01.2006", value)
 	if err != nil {
 		log.Fatalf("Parsing %s value to time failed with error: %v\n", value, err)
 	}
-	fValue := tParsed.Format("2024-01-01")
+	fValue := tParsed.Format("2006-01-02")
 
 	qString := fmt.Sprintf("SELECT id FROM %s WHERE %s = $1 LIMIT 1;", table, fieldName)
 
@@ -231,12 +229,12 @@ func (dbs Database) insertIntoData(countryIndex string, currNameIndex string, cu
 	}
 }
 
-func (dbs Database) ProcessDailyData(data *p.ForexDataForDate) {
+func (dbs Database) ProcessDailyData(data *p.ForexDataForDate) bool {
 	// check if date from data is already in db table 'date'
 	_, err := dbs.SelectIdFromTable(data.Date, "date", "date")
 	// if id was found, then data should be already in db and we can exit
 	if err == nil {
-		return
+		return false
 	}
 
 	// data are not in the db, so do insertions
@@ -248,4 +246,6 @@ func (dbs Database) ProcessDailyData(data *p.ForexDataForDate) {
 		idCurrSymbol := dbs.insertIntoCurrSymbol(curr.Symbol)
 		dbs.insertIntoData(idCountry, idCurrName, idCurrSymbol, idDate, curr.Value)
 	}
+
+	return true
 }

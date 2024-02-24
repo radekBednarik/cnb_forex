@@ -57,8 +57,10 @@ func crunchData(dbs db.Database, dateBegin string) {
 
 	now := time.Now()
 	dayDelta := 24 * time.Hour
-	fNow := now.Format("01.01.2024")
+	fNow := now.Format("02.01.2006")
 	idCounter := 0
+
+	fmt.Printf("fNow: %s\n", fNow)
 
 	for fNow != dateBegin {
 		// call api to return data
@@ -76,21 +78,21 @@ func crunchData(dbs db.Database, dateBegin string) {
 		// check, if date is in db already, if yes, then continue
 		// if we tried five consecutive previous dates and still its in the dbs
 		// then break
-		err = dbs.SelectIdFromTable(parsedData.Date, "date", "date")
+		_, err = dbs.SelectIdFromTable(parsedData.Date, "date", "date")
 		idCounter++
 		if err == nil && idCounter >= 5 {
 			break
 		}
-		idCounter = 0
 
 		// otherwise, insert data into db
-		dbs.ProcessDailyData(&parsedData)
+		status := dbs.ProcessDailyData(&parsedData)
+		if status {
+			idCounter = 0
+		}
 
 		// adjust fNow to previous day
 		now = now.Add(-dayDelta)
-		fmt.Printf("now is: %v\n", now)
-		fNow = now.Format("01.01.2024")
-		fmt.Printf("fNow is: %s\n", fNow)
+		fNow = now.Format("02.01.2006")
 
 		// wait for a bit
 		time.Sleep(200 * time.Millisecond)
