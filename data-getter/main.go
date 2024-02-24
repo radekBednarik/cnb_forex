@@ -67,7 +67,7 @@ func main() {
 	// check if tables are in db, if not, then create
 	db.CreateTables(dbs)
 
-	data, err := api.GetDailyData("16.01.2024")
+	data, err := api.GetDailyData("15.01.2024")
 	if err != nil {
 		log.Fatalf("Attempt to GET daily cnb forex data failed with error:\n%v\n", err)
 	}

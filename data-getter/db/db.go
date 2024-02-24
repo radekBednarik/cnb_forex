@@ -128,7 +128,7 @@ CREATE TABLE data (
 func insertIntoCountry(value string, dbs Database) string {
 	conn := dbs.connect()
 
-	qString := "INSERT INTO country (name) VALUES ($1) ON CONFLICT (name) DO NOTHING RETURNING id;"
+	qString := "INSERT INTO country (name) VALUES ($1) ON CONFLICT (name) DO UPDATE SET name = $1 RETURNING id;"
 
 	row := conn.QueryRow(context.Background(), qString, value)
 	var id string
@@ -145,7 +145,7 @@ func insertIntoCountry(value string, dbs Database) string {
 func insertIntoCurrName(value string, dbs Database) string {
 	conn := dbs.connect()
 
-	qString := "INSERT INTO curr_name (name) VALUES ($1) ON CONFLICT (name) DO NOTHING RETURNING id;"
+	qString := "INSERT INTO curr_name (name) VALUES ($1) ON CONFLICT (name) DO UPDATE SET name = $1 RETURNING id;"
 
 	row := conn.QueryRow(context.Background(), qString, value)
 	var id string
@@ -162,7 +162,7 @@ func insertIntoCurrName(value string, dbs Database) string {
 func insertIntoCurrSymbol(value string, dbs Database) string {
 	conn := dbs.connect()
 
-	qString := "INSERT INTO curr_symbol (symbol) VALUES ($1) ON CONFLICT (symbol) DO NOTHING RETURNING id;"
+	qString := "INSERT INTO curr_symbol (symbol) VALUES ($1) ON CONFLICT (symbol) DO UPDATE SET symbol = $1 RETURNING id;"
 
 	row := conn.QueryRow(context.Background(), qString, value)
 	var id string
@@ -179,7 +179,7 @@ func insertIntoCurrSymbol(value string, dbs Database) string {
 func insertIntoDate(value string, dbs Database) string {
 	conn := dbs.connect()
 
-	qString := "INSERT INTO date (date) VALUES ($1) ON CONFLICT (date) DO NOTHING RETURNING id;"
+	qString := "INSERT INTO date (date) VALUES (TO_DATE($1, 'DD.MM.YYYY')) ON CONFLICT (date) DO NOTHING RETURNING id;"
 
 	row := conn.QueryRow(context.Background(), qString, value)
 	var id string
@@ -233,7 +233,6 @@ func ProcessDailyData(data *p.ForexDataForDate, dbs Database) {
 	idDate := insertIntoDate(data.Date, dbs)
 
 	for _, curr := range data.ForexData {
-		fmt.Println(curr)
 		idCountry := insertIntoCountry(curr.Country, dbs)
 		idCurrName := insertIntoCurrName(curr.Name, dbs)
 		idCurrSymbol := insertIntoCurrSymbol(curr.Symbol, dbs)
