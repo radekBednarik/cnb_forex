@@ -86,6 +86,9 @@ func crunchData(dbs db.Database, dateBegin string) {
 		now = now.Add(-dayDelta)
 		fNow = now.Format("01.01.2024")
 
+		// wait for a bit
+		time.Sleep(200 * time.Millisecond)
+
 	}
 }
 
