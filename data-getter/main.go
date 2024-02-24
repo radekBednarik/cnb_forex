@@ -53,6 +53,8 @@ func loadConfig(path string) (Config, error) {
 }
 
 func crunchData(dbs db.Database, dateBegin string) {
+	fmt.Println("Data crunch started...")
+
 	now := time.Now()
 	dayDelta := 24 * time.Hour
 	fNow := now.Format("01.01.2024")
@@ -68,6 +70,8 @@ func crunchData(dbs db.Database, dateBegin string) {
 		// parse data
 		parsedData := parser.ForexDataForDate{}
 		parsedData.ParseFromText(data)
+
+		fmt.Printf("Data poing: %s\n", parsedData.Date)
 
 		// check, if date is in db already, if yes, then continue
 		// if we tried five consecutive previous dates and still its in the dbs
@@ -89,7 +93,11 @@ func crunchData(dbs db.Database, dateBegin string) {
 		// wait for a bit
 		time.Sleep(200 * time.Millisecond)
 
+		fmt.Println("=====")
+
 	}
+
+	fmt.Println("Done.")
 }
 
 func main() {
