@@ -65,9 +65,9 @@ func main() {
 	defer dbs.Pool.Close()
 
 	// check if tables are in db, if not, then create
-	db.CreateTables(dbs)
+	dbs.CreateTables()
 
-	data, err := api.GetDailyData("15.01.2024")
+	data, err := api.GetDailyData("17.01.2024")
 	if err != nil {
 		log.Fatalf("Attempt to GET daily cnb forex data failed with error:\n%v\n", err)
 	}
@@ -75,7 +75,7 @@ func main() {
 	pData := parser.ForexDataForDate{}
 	pData.ParseFromText(data)
 
-	db.ProcessDailyData(&pData, dbs)
+	dbs.ProcessDailyData(&pData)
 
 	fmt.Println(pData)
 }

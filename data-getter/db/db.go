@@ -33,7 +33,7 @@ func (d *Database) New(connString string) *Database {
 	return d
 }
 
-func (d *Database) connect() *pgpool.Conn {
+func (d Database) connect() *pgpool.Conn {
 	c, err := d.Pool.Acquire(context.Background())
 	if err != nil {
 		log.Fatalf("Could not acquire connection from db pool. Error: %v\n", err)
@@ -42,7 +42,7 @@ func (d *Database) connect() *pgpool.Conn {
 	return c
 }
 
-func CreateTables(dbs Database) {
+func (dbs Database) CreateTables() {
 	conn := dbs.connect()
 	// check, if there is the main table in the db
 	qString := `
@@ -125,7 +125,7 @@ CREATE TABLE data (
 	}
 }
 
-func insertIntoCountry(value string, dbs Database) string {
+func (dbs Database) insertIntoCountry(value string) string {
 	conn := dbs.connect()
 
 	qString := "INSERT INTO country (name) VALUES ($1) ON CONFLICT (name) DO UPDATE SET name = $1 RETURNING id;"
@@ -142,7 +142,7 @@ func insertIntoCountry(value string, dbs Database) string {
 	return id
 }
 
-func insertIntoCurrName(value string, dbs Database) string {
+func (dbs Database) insertIntoCurrName(value string) string {
 	conn := dbs.connect()
 
 	qString := "INSERT INTO curr_name (name) VALUES ($1) ON CONFLICT (name) DO UPDATE SET name = $1 RETURNING id;"
@@ -159,7 +159,7 @@ func insertIntoCurrName(value string, dbs Database) string {
 	return id
 }
 
-func insertIntoCurrSymbol(value string, dbs Database) string {
+func (dbs Database) insertIntoCurrSymbol(value string) string {
 	conn := dbs.connect()
 
 	qString := "INSERT INTO curr_symbol (symbol) VALUES ($1) ON CONFLICT (symbol) DO UPDATE SET symbol = $1 RETURNING id;"
@@ -176,7 +176,7 @@ func insertIntoCurrSymbol(value string, dbs Database) string {
 	return id
 }
 
-func insertIntoDate(value string, dbs Database) string {
+func (dbs Database) insertIntoDate(value string) string {
 	conn := dbs.connect()
 
 	qString := "INSERT INTO date (date) VALUES (TO_DATE($1, 'DD.MM.YYYY')) ON CONFLICT (date) DO NOTHING RETURNING id;"
@@ -193,7 +193,7 @@ func insertIntoDate(value string, dbs Database) string {
 	return id
 }
 
-func selectIdFromTable(value string, fieldName string, table string, dbs Database) (string, error) {
+func (dbs Database) selectIdFromTable(value string, fieldName string, table string) (string, error) {
 	conn := dbs.connect()
 
 	qString := fmt.Sprintf("SELECT id FROM %s WHERE %s = $1 LIMIT 1;", table, fieldName)
@@ -208,7 +208,7 @@ func selectIdFromTable(value string, fieldName string, table string, dbs Databas
 	return result, err
 }
 
-func insertIntoData(countryIndex string, currNameIndex string, currSymbolIndex string, dateIndex string, value float64, dbs Database) {
+func (dbs Database) insertIntoData(countryIndex string, currNameIndex string, currSymbolIndex string, dateIndex string, value float64) {
 	conn := dbs.connect()
 
 	qString := "INSERT INTO data (country_id, curr_name_id, curr_symbol_id, date_id, value) VALUES ($1, $2, $3, $4, $5);"
@@ -221,21 +221,21 @@ func insertIntoData(countryIndex string, currNameIndex string, currSymbolIndex s
 	}
 }
 
-func ProcessDailyData(data *p.ForexDataForDate, dbs Database) {
+func (dbs Database) ProcessDailyData(data *p.ForexDataForDate) {
 	// check if date from data is already in db table 'date'
-	_, err := selectIdFromTable(data.Date, "date", "date", dbs)
+	_, err := dbs.selectIdFromTable(data.Date, "date", "date")
 	// if id was found, then data should be already in db and we can exit
 	if err == nil {
 		return
 	}
 
 	// data are not in the db, so do insertions
-	idDate := insertIntoDate(data.Date, dbs)
+	idDate := dbs.insertIntoDate(data.Date)
 
 	for _, curr := range data.ForexData {
-		idCountry := insertIntoCountry(curr.Country, dbs)
-		idCurrName := insertIntoCurrName(curr.Name, dbs)
-		idCurrSymbol := insertIntoCurrSymbol(curr.Symbol, dbs)
-		insertIntoData(idCountry, idCurrName, idCurrSymbol, idDate, curr.Value, dbs)
+		idCountry := dbs.insertIntoCountry(curr.Country)
+		idCurrName := dbs.insertIntoCurrName(curr.Name)
+		idCurrSymbol := dbs.insertIntoCurrSymbol(curr.Symbol)
+		dbs.insertIntoData(idCountry, idCurrName, idCurrSymbol, idDate, curr.Value)
 	}
 }
