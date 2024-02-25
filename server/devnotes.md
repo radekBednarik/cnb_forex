@@ -12,23 +12,19 @@
 
 - dateTo
 
-- date
-
 ### response body structure
 
 ```json
 {
-  "data": [
-    {
-      "2024-02-25": [
-        {
-          "currName": "dolar",
-          "currSymbol": "USD",
-          "value": "20.01"
-        }
-      ]
-    }
-  ]
+  "data": {
+    "2024-02-25": [
+      {
+        "currName": "dolar",
+        "currSymbol": "USD",
+        "value": "20.01"
+      }
+    ]
+  }
 }
 ```
 

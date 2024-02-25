@@ -4,6 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func HandleDashboardData(c *gin.Context) {
+func GetDashboardDataV1(c *gin.Context) {
 	//
 }

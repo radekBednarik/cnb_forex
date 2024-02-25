@@ -38,3 +38,81 @@ func (d Database) connect() *pgpool.Conn {
 
 	return c
 }
+
+type SingleCurrData struct {
+	Name    string
+	Symbol  string
+	Country string
+	Value   float64
+}
+
+type DataByDate = map[string][]SingleCurrData
+
+type Data struct {
+	Data DataByDate
+}
+
+func (d Database) SelectDashboardDataV1(dateFrom string, dateTo string) (Data, error) {
+	conn := d.connect()
+	defer conn.Release()
+
+	statement := `
+    select 
+      dt.date as date,
+      c."name" as country_name,
+      cn."name" as currency_name,
+      cs.symbol as currency_symbol,
+      d.value as czk_to_currency_value
+    from "data" d 
+    left join country c 
+    on d.country_id = c.id 
+    left join curr_name cn 
+    on d.curr_name_id = cn.id 
+    left join curr_symbol cs 
+    on d.curr_symbol_id = cs.id
+    left join "date" dt
+    on d.date_id = dt.id
+    where dt.date between $1 and $2;
+  `
+
+	rows, err := conn.Query(context.Background(), statement, dateFrom, dateTo)
+	if err != nil {
+		return Data{}, err
+	}
+	defer rows.Close()
+
+	data := Data{}
+	dataByDate := DataByDate{}
+	singleDateData := []SingleCurrData{}
+	tempDate := dateFrom
+
+	for rows.Next() {
+		var date string
+		var currData SingleCurrData
+
+		err := rows.Scan(&date, &currData.Country, &currData.Name, &currData.Symbol, &currData.Value)
+		if err != nil {
+			return Data{}, err
+		}
+
+		if tempDate == date {
+			singleDateData = append(singleDateData, currData)
+			continue
+		}
+
+		// date changed
+		// add data list to map date prop
+		dataByDate[date] = singleDateData
+		// clear list
+		singleDateData = singleDateData[:0]
+		// fill new value
+		singleDateData = append(singleDateData, currData)
+		// adjust tempDate to new date
+		tempDate = date
+
+	}
+
+	data.Data = dataByDate
+
+	return data, nil
+}
