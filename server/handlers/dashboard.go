@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -23,7 +24,7 @@ func getDashboardDataV1(c *gin.Context, dbs database.Database) {
 	// get data from database
 	data, err := dbs.SelectDashboardDataV1(dateFrom, dateTo)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to return data from database."})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("DB error: %v", err)})
 		return
 	}
 

@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"log"
+	"time"
 
 	pgpool "github.com/jackc/pgx/v5/pgxpool"
 )
@@ -87,7 +88,7 @@ func (d Database) SelectDashboardDataV1(dateFrom string, dateTo string) (Data, e
 	tempDate := dateFrom
 
 	for rows.Next() {
-		var date string
+		var date time.Time
 		var currData SingleCurrData
 
 		err := rows.Scan(&date, &currData.Country, &currData.Name, &currData.Symbol, &currData.Value)
@@ -95,26 +96,26 @@ func (d Database) SelectDashboardDataV1(dateFrom string, dateTo string) (Data, e
 			return Data{}, err
 		}
 
-		if tempDate == date {
+		fDate := date.Format("2006-01-02")
+
+		if tempDate == fDate {
 			singleDateData = append(singleDateData, currData)
 			continue
 		}
 
 		// date changed
 		// add data list to map date prop
-		dataByDate[date] = singleDateData
+		dataByDate[fDate] = singleDateData
 		// clear list
 		singleDateData = singleDateData[:0]
 		// fill new value
 		singleDateData = append(singleDateData, currData)
 		// adjust tempDate to new date
-		tempDate = date
+		tempDate = fDate
 
 	}
 
 	data.Data = dataByDate
-
-	log.Printf("end of db call. data: %v. Error: %v\n", data, err)
 
 	return data, nil
 }
