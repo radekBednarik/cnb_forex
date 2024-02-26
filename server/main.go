@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/radekBednarik/cnb_forex/server/database"
+	"github.com/radekBednarik/cnb_forex/server/handlers"
 )
 
 func main() {
@@ -16,4 +17,9 @@ func main() {
 	connString := fmt.Sprintf("user=%s password=%s host=localhost port=5432 dbname=cnb_forex sslmode=verify-ca pool_max_conns=16", os.Getenv("USER"), os.Getenv("PASSWORD"))
 	dbs := database.Database{}
 	dbs.New(connString)
+
+	// handle /api/dashboard/v1/data
+	handlers.GetDashboardDataV1(g, dbs)
+
+	g.Run()
 }
