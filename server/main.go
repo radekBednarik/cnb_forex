@@ -17,6 +17,7 @@ func main() {
 	connString := fmt.Sprintf("user=%s password=%s host=localhost port=5432 dbname=cnb_forex sslmode=verify-ca pool_max_conns=16", os.Getenv("USER"), os.Getenv("PASSWORD"))
 	dbs := database.Database{}
 	dbs.New(connString)
+	defer dbs.Pool.Close()
 
 	// handle /api/dashboard/v1/data
 	handlers.GetDashboardDataV1(g, dbs)

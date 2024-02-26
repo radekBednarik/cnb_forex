@@ -114,5 +114,7 @@ func (d Database) SelectDashboardDataV1(dateFrom string, dateTo string) (Data, e
 
 	data.Data = dataByDate
 
+	log.Printf("end of db call. data: %v. Error: %v\n", data, err)
+
 	return data, nil
 }
