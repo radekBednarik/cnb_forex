@@ -86,7 +86,7 @@ func (d Database) SelectDashboardDataV1(dateFrom string, dateTo string) (Data, e
 	data := Data{}
 	dataByDate := DataByDate{}
 	singleDateData := []SingleCurrData{}
-	tempDate := dateFrom
+	tempDate := dateTo
 
 	for rows.Next() {
 		var date time.Time
@@ -101,6 +101,11 @@ func (d Database) SelectDashboardDataV1(dateFrom string, dateTo string) (Data, e
 
 		if tempDate == fDate {
 			singleDateData = append(singleDateData, currData)
+			// handle special case, when dateFrom and dateTo are equal
+			if fDate == dateFrom {
+				dataByDate[fDate] = singleDateData
+			}
+
 			continue
 		}
 
