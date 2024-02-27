@@ -73,7 +73,8 @@ func (d Database) SelectDashboardDataV1(dateFrom string, dateTo string) (Data, e
     on d.curr_symbol_id = cs.id
     left join "date" dt
     on d.date_id = dt.id
-    where dt.date between $1 and $2;
+    where dt.date between $1 and $2
+    order by dt.date asc;
   `
 
 	rows, err := conn.Query(context.Background(), statement, dateFrom, dateTo)
