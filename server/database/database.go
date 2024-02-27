@@ -115,6 +115,10 @@ func (d Database) SelectDashboardDataV1(dateFrom string, dateTo string) (Data, e
 
 	}
 
+	if rows.Err() != nil {
+		return Data{}, rows.Err()
+	}
+
 	data.Data = dataByDate
 
 	return data, nil

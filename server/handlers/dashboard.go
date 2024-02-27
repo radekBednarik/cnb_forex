@@ -29,8 +29,10 @@ func getDashboardDataV1(c *gin.Context, dbs database.Database) {
 	}
 
 	// stream data
-	for _, dObject := range data.Data {
-		iJson, err := json.Marshal(dObject)
+	for name, dObject := range data.Data {
+		toMarshall := make(map[string][]database.SingleCurrData)
+		toMarshall[name] = dObject
+		iJson, err := json.Marshal(toMarshall)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse data returned from database."})
 			return
