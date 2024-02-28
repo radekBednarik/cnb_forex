@@ -41,10 +41,10 @@ func (d Database) connect() *pgpool.Conn {
 }
 
 type SingleCurrData struct {
-	Name    string
-	Symbol  string
-	Country string
-	Value   float64
+	Name    string  `json:"name"`
+	Symbol  string  `json:"symbol"`
+	Country string  `json:"country"`
+	Value   float64 `json:"value"`
 }
 
 type DataByDate = map[string][]SingleCurrData
