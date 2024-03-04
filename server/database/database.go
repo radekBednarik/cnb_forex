@@ -129,3 +129,50 @@ func (d Database) SelectDashboardDataV1(dateFrom string, dateTo string) (Data, e
 
 	return data, nil
 }
+
+type CurrenciesSymbols struct {
+	Currencies []string `json:"currencies"`
+}
+
+func (d Database) SelectCurrenciesSymbolsV1(dateFrom string, dateTo string) (CurrenciesSymbols, error) {
+	conn := d.connect()
+	defer conn.Release()
+
+	statement := `
+    select
+      distinct cs.symbol as curr_symbol
+    from "data" d 
+    left join "date" dt
+    on d.date_id = dt.id 
+    left join curr_symbol cs 
+    on d.curr_symbol_id = cs.id 
+    where dt.date between $1 and $2
+    order by cs.symbol asc;
+  `
+
+	rows, err := conn.Query(context.Background(), statement, dateFrom, dateTo)
+	if err != nil {
+		return CurrenciesSymbols{}, err
+	}
+	defer rows.Close()
+
+	data := CurrenciesSymbols{}
+	currList := make([]string, 0, 130)
+	symbol := ""
+
+	for rows.Next() {
+		err := rows.Scan(&symbol)
+		if err != nil {
+			return CurrenciesSymbols{}, err
+		}
+		currList = append(currList, symbol)
+	}
+
+	if rows.Err() != nil {
+		return CurrenciesSymbols{}, rows.Err()
+	}
+
+	data.Currencies = currList
+
+	return data, nil
+}
