@@ -74,11 +74,14 @@ func crunchData(dbs db.Database, dateBegin string) {
 		fmt.Printf("Data point: %s\n", parsedData.Date)
 
 		// check, if date is in db already, if yes, then continue
-		// if we tried five consecutive previous dates and still its in the dbs
+		// if we tried `maxCount` consecutive previous dates and still its in the dbs
 		// then break
 		_, err = dbs.SelectIdFromTable(parsedData.Date, "date", "date")
 		idCounter++
-		if err == nil && idCounter >= 5 {
+
+		const maxCount = 10
+
+		if err == nil && idCounter >= maxCount {
 			break
 		}
 
