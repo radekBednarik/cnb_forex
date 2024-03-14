@@ -35,3 +35,10 @@
 	</form>
 </section>
 <slot />
+
+<style>
+	#filter-bar {
+		flex: auto;
+		flex-direction: row;
+	}
+</style>
