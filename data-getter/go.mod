@@ -3,7 +3,7 @@ module github.com/radekBednarik/cnb_forex/data-getter
 go 1.21.6
 
 require (
-	github.com/jackc/pgx/v5 v5.5.3
+	github.com/jackc/pgx/v5 v5.5.4
 	github.com/pelletier/go-toml v1.9.5
 )
 
