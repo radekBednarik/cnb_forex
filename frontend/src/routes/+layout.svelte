@@ -5,7 +5,7 @@
 	export let data;
 </script>
 
-<div class="my-12 mx-12">
+<div class="mx-12 my-12">
 	<header>
 		<Heading tag="h1"><Span gradient>Daily forex data</Span></Heading>
 		<Heading tag="h4">
