@@ -5,40 +5,35 @@
 	export let data;
 </script>
 
-<header>
-	<Heading tag="h1"><Span gradient>Daily forex data</Span></Heading>
-	<Heading tag="h4">
-		provided by <a
-			href="https://www.cnb.cz"
-			target="_blank"
-			referrerpolicy="no-referrer-when-downgrade">Czech national bank</a
-		>
-	</Heading>
-	<Hr />
-</header>
+<div class="my-12 mx-12">
+	<header>
+		<Heading tag="h1"><Span gradient>Daily forex data</Span></Heading>
+		<Heading tag="h4">
+			provided by <a
+				href="https://www.cnb.cz"
+				target="_blank"
+				referrerpolicy="no-referrer-when-downgrade">Czech national bank</a
+			>
+		</Heading>
+		<Hr />
+	</header>
 
-<section id="filter-bar">
-	<form>
-		<div>
-			<div>
-				<Label for="date-from">Date from</Label>
-				<Input type="date" id="date-from" required />
+	<section id="filter-bar">
+		<form method="post" enctype="application/x-www-form-urlencoded">
+			<div class="mb-6 flex flex-row">
+				<div class="w-1/3 pr-2">
+					<Label for="date-from">Date from</Label>
+					<Input type="date" id="date-from" required />
+				</div>
+				<div class="w-1/3 pr-2">
+					<Label for="date-to">Date to</Label>
+					<Input type="date" id="date-to" required />
+				</div>
+				<div class="w-1/3 pt-5">
+					<Input type="submit" value="Get data" color="green" />
+				</div>
 			</div>
-			<div>
-				<Label for="date-to">Date to</Label>
-				<Input type="date" id="date-to" required />
-			</div>
-			<div>
-				<Button color="green">Filter data</Button>
-			</div>
-		</div>
-	</form>
-</section>
-<slot />
-
-<style>
-	#filter-bar {
-		flex: auto;
-		flex-direction: row;
-	}
-</style>
+		</form>
+	</section>
+	<slot />
+</div>
