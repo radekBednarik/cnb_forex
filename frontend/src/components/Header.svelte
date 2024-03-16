@@ -9,7 +9,7 @@
 		provided by <a
 			href="https://www.cnb.cz"
 			target="_blank"
-			referrerpolicy="no-referrer-when-downgrade">Czech national bank</a
+			referrerpolicy="no-referrer-when-downgrade">Czech National Bank</a
 		>
 	</Heading>
 	<Hr />
