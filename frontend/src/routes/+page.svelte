@@ -1,7 +1,16 @@
 <script>
-    import LineChart from "../components/LineChart.svelte";
-    import {wrCurrData} from "$lib/stores/stores.js";
+	import LineChart from '../components/LineChart.svelte';
+	import { wrCurrData } from '$lib/stores/stores.js';
 
+	let currData = '';
+
+	wrCurrData.subscribe((value) => {
+		if (value.length > 0) {
+			currData = JSON.parse(value);
+		}
+	});
 </script>
 
-<LineChart />
+<p>
+	{JSON.stringify(currData)}
+</p>
