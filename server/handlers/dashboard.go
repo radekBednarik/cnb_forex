@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
@@ -28,20 +27,7 @@ func getDashboardDataV1(c *gin.Context, dbs database.Database) {
 		return
 	}
 
-	// stream data
-	for name, dObject := range data.Data {
-		toMarshall := make(map[string][]database.SingleCurrData)
-		toMarshall[name] = dObject
-		iJson, err := json.Marshal(toMarshall)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse data returned from database."})
-			return
-		}
-		c.Writer.Write(iJson)
-		c.Writer.Flush()
-	}
-
-	c.Status(http.StatusOK)
+	c.JSON(200, data)
 }
 
 func GetDashboardDataV1(s *gin.Engine, dbs database.Database) {
