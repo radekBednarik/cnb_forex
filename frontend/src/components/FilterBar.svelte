@@ -19,19 +19,9 @@
 		const response = await fetch(
 			`http://localhost:8080/api/dashboard/v1/data?dateFrom=${dateFrom}&dateTo=${dateTo}`
 		);
-		const decoder = new TextDecoder("utf-8");
-		const data = [] ;
-		const reader = response.body?.getReader();
-		
-		let result  = await reader?.read();
-		let chunk = result?.value ? decoder.decode(result.value, {stream: true}) : "";
-		console.log(chunk)
-		console.log("=========")
-		if (!result?.done) {
-			data.push(JSON.parse(chunk));
-		}
+		const data = await response.json();
 
-		console.log(data)
+		console.log(JSON.stringify(data, null, 2));
 	}
 </script>
 

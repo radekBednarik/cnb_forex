@@ -50,7 +50,7 @@ type SingleCurrData struct {
 type DataByDate = map[string][]SingleCurrData
 
 type Data struct {
-	Data DataByDate
+	Data DataByDate `json:"data"`
 }
 
 func (d Database) SelectDashboardDataV1(dateFrom string, dateTo string) (Data, error) {

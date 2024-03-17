@@ -12,6 +12,7 @@ import (
 
 func main() {
 	g := gin.Default()
+	g.SetTrustedProxies([]string{"localhost", "127.0.0.1", "::1"})
 
 	// create db pool
 	connString := fmt.Sprintf("user=%s password=%s host=localhost port=5432 dbname=cnb_forex sslmode=verify-ca pool_max_conns=16", os.Getenv("USER"), os.Getenv("PASSWORD"))
