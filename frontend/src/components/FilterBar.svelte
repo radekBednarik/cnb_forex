@@ -19,9 +19,8 @@
 		const response = await fetch(
 			`http://localhost:8080/api/dashboard/v1/data?dateFrom=${dateFrom}&dateTo=${dateTo}`
 		);
-		const data = await response.json();
-
-		console.log(JSON.stringify(data, null, 2));
+		currData = await response.json();
+		wrCurrData.set(JSON.stringify(currData));
 	}
 </script>
 
