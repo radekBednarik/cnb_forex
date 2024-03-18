@@ -7,6 +7,8 @@
 	wrCurrData.subscribe((value) => {
 		currData = value;
 	});
+
+	
 </script>
 
 {#if Object.keys(currData).length > 0}
