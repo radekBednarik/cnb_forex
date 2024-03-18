@@ -2,15 +2,15 @@
 	import LineChart from '../components/LineChart.svelte';
 	import { wrCurrData } from '$lib/stores/stores.js';
 
-	let currData = '';
+	let currData = {};
 
 	wrCurrData.subscribe((value) => {
-		if (value.length > 0) {
-			currData = JSON.parse(value);
-		}
+		currData = value;
 	});
 </script>
 
-<p>
-	{JSON.stringify(currData)}
-</p>
+{#if Object.keys(currData).length > 0}
+	<p>
+		{JSON.stringify(currData)}
+	</p>
+{/if}

@@ -21,7 +21,7 @@
 			`http://localhost:8080/api/dashboard/v1/data?dateFrom=${dateFrom}&dateTo=${dateTo}`
 		);
 		currData = await response.json();
-		wrCurrData.set(JSON.stringify(currData));
+		wrCurrData.set(currData);
 	}
 </script>
 
@@ -36,7 +36,7 @@
 			<Input type="date" value={dateTo} id="date-to" required on:input={getDateTo} />
 		</div>
 		<div class="flex-1 pt-5">
-			<GradientButton outline color="greenToBlue" on:click={getData}>Get data</GradientButton>
+			<GradientButton outline color="greenToBlue" on:click={getData} >Get data</GradientButton>
 		</div>
 	</div>
 </section>
