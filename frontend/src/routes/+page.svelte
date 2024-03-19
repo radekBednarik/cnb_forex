@@ -9,10 +9,6 @@
 	});
 </script>
 
-<LineChart />
-
 {#if Object.keys(currData).length > 0}
-	<p>
-		{JSON.stringify(currData)}
-	</p>
+	<LineChart data={currData} />
 {/if}

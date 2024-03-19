@@ -131,8 +131,9 @@ func (d Database) SelectDashboardDataV1(dateFrom string, dateTo string) (Data, e
 }
 
 type OneCurrData struct {
-	Dates  []string  `json:"dates"`
-	Values []float64 `json:"values"`
+	Currency string    `json:"currency"`
+	Dates    []string  `json:"dates"`
+	Values   []float64 `json:"values"`
 }
 
 func (d Database) SelectDashboardDataV2(dateFrom string, dateTo string, currency string) (OneCurrData, error) {
@@ -159,7 +160,7 @@ func (d Database) SelectDashboardDataV2(dateFrom string, dateTo string, currency
 	}
 	defer rows.Close()
 
-	data := OneCurrData{}
+	data := OneCurrData{Currency: currency}
 	var date time.Time
 	var value float64
 
