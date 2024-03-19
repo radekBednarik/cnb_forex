@@ -9,7 +9,7 @@
 
 	let options = {
 		chart: {
-			height: '400px',
+			height: '500px',
 			maxWidth: '100%',
 			type: 'line',
 			fontFamily: 'Inter, sans-serif',
@@ -30,7 +30,7 @@
 			enabled: false
 		},
 		stroke: {
-			width: 6,
+			width: 2,
 			curve: 'smooth'
 		},
 		grid: {
@@ -39,7 +39,7 @@
 			padding: {
 				left: 2,
 				right: 2,
-				top: -26
+				top: 0
 			}
 		},
 		series: [
@@ -50,7 +50,10 @@
 			}
 		],
 		legend: {
-			show: false
+			show: true,
+			showForSingleSeries: true,
+			position: 'bottom',
+			horizontalPosition: 'right'
 		},
 		xaxis: {
 			categories: dates,
@@ -69,11 +72,11 @@
 			}
 		},
 		yaxis: {
-			show: false
+			show: true
 		}
 	};
 </script>
 
-<Card size="lg">
+<Card size="xl" padding="sm">
 	<Chart {options} />
 </Card>
