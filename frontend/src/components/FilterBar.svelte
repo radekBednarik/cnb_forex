@@ -15,8 +15,8 @@
 	let selected = 'USD';
 
 	data.currencies.forEach((symbol) => {
-		currSymbols.push({value: symbol, name: symbol})
-	})
+		currSymbols.push({ value: symbol, name: symbol });
+	});
 
 	function getDateFrom(event) {
 		dateFrom = event.target.value;
@@ -28,7 +28,7 @@
 
 	async function getData() {
 		const response = await fetch(
-			`http://localhost:8080/api/dashboard/v1/data?dateFrom=${dateFrom}&dateTo=${dateTo}`
+			`http://localhost:8080/api/dashboard/v2/data?dateFrom=${dateFrom}&dateTo=${dateTo}&currency=${selected}`
 		);
 		currData = await response.json();
 		wrCurrData.set(currData);

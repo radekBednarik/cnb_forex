@@ -130,6 +130,57 @@ func (d Database) SelectDashboardDataV1(dateFrom string, dateTo string) (Data, e
 	return data, nil
 }
 
+type OneCurrData struct {
+	Dates  []string  `json:"dates"`
+	Values []float64 `json:"values"`
+}
+
+func (d Database) SelectDashboardDataV2(dateFrom string, dateTo string, currency string) (OneCurrData, error) {
+	conn := d.connect()
+	defer conn.Release()
+
+	statement := `
+    select
+      dt."date" as date, 
+      round(d.value::numeric, 3) as value
+    from "data" d 
+    left join "date" dt
+    on d.date_id = dt.id 
+    left join curr_symbol cs 
+    on d.curr_symbol_id = cs.id 
+    where dt."date" between $1 and $2 
+      and cs.symbol = $3 
+    order by dt."date" asc;
+  `
+
+	rows, err := conn.Query(context.Background(), statement, dateFrom, dateTo, currency)
+	if err != nil {
+		return OneCurrData{}, err
+	}
+	defer rows.Close()
+
+	data := OneCurrData{}
+	var date time.Time
+	var value float64
+
+	for rows.Next() {
+		err := rows.Scan(&date, &value)
+		if err != nil {
+			return OneCurrData{}, err
+		}
+
+		data.Dates = append(data.Dates, date.Format("2006-01-02"))
+		data.Values = append(data.Values, value)
+
+	}
+
+	if rows.Err() != nil {
+		return OneCurrData{}, rows.Err()
+	}
+
+	return data, nil
+}
+
 type CurrenciesSymbols struct {
 	Currencies []string `json:"currencies"`
 }

@@ -7,11 +7,9 @@
 	wrCurrData.subscribe((value) => {
 		currData = value;
 	});
-
-	
 </script>
 
-<LineChart/>
+<LineChart />
 
 {#if Object.keys(currData).length > 0}
 	<p>

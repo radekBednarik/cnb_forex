@@ -22,6 +22,8 @@ func main() {
 
 	// handle /api/dashboard/v1/data
 	handlers.GetDashboardDataV1(g, dbs)
+	// handle /api/dashboard/v2/data
+	handlers.GetDashboardDataV2(g, dbs)
 	// handle /api/currencies/v1/symbols
 	handlers.GetCurrenciesSymbolsV1(g, dbs)
 
