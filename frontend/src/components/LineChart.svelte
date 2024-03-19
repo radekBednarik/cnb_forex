@@ -1,11 +1,11 @@
 <script>
-	import { Chart, Card,  } from 'flowbite-svelte';
-	
-  export let data;
+	import { Chart, Card } from 'flowbite-svelte';
 
-	let currency = data.currency; 
-	let dates = data.dates; 
-	let values = data.values; 
+	export let data;
+
+	let currency = data.currency;
+	let dates = data.dates;
+	let values = data.values;
 
 	let options = {
 		chart: {
@@ -74,11 +74,6 @@
 	};
 </script>
 
-<Card>
-	<div class="mb-5 flex justify-between">
-		<div class="grid grid-cols-2 gap-4">
-				
-		</div>
-	</div>
+<Card size="lg">
 	<Chart {options} />
 </Card>
