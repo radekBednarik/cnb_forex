@@ -9,6 +9,8 @@
 	});
 </script>
 
-{#key currData}
-	<LineChart data={currData} />
-{/key}
+{#if Object.keys(currData).length > 0}
+	{#key currData}
+		<LineChart data={currData} />
+	{/key}
+{/if}
