@@ -47,7 +47,7 @@
 		</div>
 		<div class="flex-1 pr-2">
 			<Label for="currency">Currency</Label>
-			<Select items={currSymbols} bind:value={selected}></Select>
+			<Select items={currSymbols} bind:value={selected} id="currency"></Select>
 		</div>
 		<div class="flex-1 pt-5">
 			<GradientButton outline color="greenToBlue" on:click={getData}>Get data</GradientButton>

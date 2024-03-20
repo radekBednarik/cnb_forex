@@ -10,7 +10,7 @@ import (
 )
 
 func getCurrenciesSymbolsV1(c *gin.Context, dbs database.Database) {
-	c.Header("Content-Type", "application/json")
+	c.Header("Access-Control-Allow-Origin", "*")
 	// query params
 	now := time.Now()
 	nowFormatted := now.Format("2006-01-02")
