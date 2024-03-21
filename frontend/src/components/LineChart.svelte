@@ -38,7 +38,7 @@
 			strokeDashArray: 4,
 			padding: {
 				left: 2,
-				right: 2,
+				right: 4,
 				top: 0
 			}
 		},
@@ -77,6 +77,6 @@
 	};
 </script>
 
-<Card size="xl" padding="sm">
+<Card padding="sm" class="max-w-screen-2xl">
 	<Chart {options} />
 </Card>
