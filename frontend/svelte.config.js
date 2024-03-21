@@ -9,6 +9,7 @@ const config = {
 		// See https://kit.svelte.dev/docs/adapters for more information about adapters.
 		adapter: adapter(),
 		csp: {
+			mode: "auto",
 			directives: {
 				'script-src': ['self', 'unsafe-inline'],
 				'object-src': ['none'],
