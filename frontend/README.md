@@ -1,38 +1,25 @@
-# create-svelte
+# Daily forex data app
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
+Learning project using [SvelteKit](https://kit.svelte.dev), [Go](https://go.dev) and [Postgresql](https://www.postgresql.org)
 
-## Creating a project
+## Preconditions
 
-If you're seeing this, you've probably already done this step. Congrats!
+- Linux OS (Ubuntu based) - should work on Windows as well, but I did not try it
+- Node LTS
+- git
+- postgresql
+  - create a database `cnb_forex` with user, who have rights to create tables. You can use shell scripts in `/bin/db` folder. Modify them as you see fit.
+- browser like Chromium or Firefox
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+## Installation
 
-# create a new project in my-app
-npm create svelte@latest my-app
-```
+- clone via `git clone git@github.com:radekBednarik/cnb_forex.git`
+- create a database and user using scripts in `/bin/db` folder
+- switch to `/data-getter` folder and run `go mod tidy` and `go build main.go`
+- then run `USER=<username> PASSWORD=<password> ./main` to download all data. Data are downloaded from public [Czech National Bank](https://www.cnb.cz) website starting from current date and going backwards to the date set in `/data-getter/config.toml` file. If you leave the setting, the download can take a while, since we are not using concurrency since we do not want to get banned on the server.
+- switch to `/server` folder and run `go mod tidy` and `go build main.go`
+- start server using `USER=<username> PASSWORD=<password> ./main`
+- switch to `/frontend` and run `npm install`
+- then run `npm run dev` to start dev server
 
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+App is ready to be used.
