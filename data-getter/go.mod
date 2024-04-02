@@ -1,6 +1,6 @@
 module github.com/radekBednarik/cnb_forex/data-getter
 
-go 1.21.6
+go 1.22.1
 
 require (
 	github.com/jackc/pgx/v5 v5.5.4
