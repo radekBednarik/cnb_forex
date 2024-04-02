@@ -64,7 +64,8 @@ func crunchData(dbs db.Database, dateBegin string) {
 		// call api to return data
 		data, err := api.GetDailyData(fNow)
 		if err != nil {
-			log.Fatalf("Failed to get daily fx data for date '%s'. Error: %v", fNow, err)
+			log.Printf("Failed to get daily fx data for date '%s'. Error: %v", fNow, err)
+			continue
 		}
 
 		// parse data
@@ -105,6 +106,21 @@ func crunchData(dbs db.Database, dateBegin string) {
 	fmt.Println("Done.")
 }
 
+func pExec(dbs db.Database, beginDate string) {
+	crunchData(dbs, beginDate)
+
+	ticker := time.NewTicker(24 * time.Hour)
+
+	go func() {
+		for {
+			<-ticker.C
+			crunchData(dbs, beginDate)
+		}
+	}()
+
+	select {}
+}
+
 func main() {
 	flags := flags()
 	config, err := loadConfig(flags.configPath)
@@ -122,5 +138,5 @@ func main() {
 	dbs.CreateTables()
 
 	// process the data
-	crunchData(dbs, config.Date.Begin)
+	pExec(dbs, config.Date.Begin)
 }
