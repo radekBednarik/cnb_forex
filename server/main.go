@@ -27,5 +27,5 @@ func main() {
 	// handle /api/currencies/v1/symbols
 	handlers.GetCurrenciesSymbolsV1(g, dbs)
 
-	g.Run()
+	g.Run(":8080")
 }
